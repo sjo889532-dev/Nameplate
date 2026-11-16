@@ -37,8 +37,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_C_COMPILER=clang `
             -DCMAKE_CXX_COMPILER=clang `
-            -DCMAKE_C_COMPILER_FORCED=ON `
-            -DCMAKE_CXX_COMPILER_FORCED=ON `
             -DTARGET_PLATFORM=ASHITA_V4 `
             -DASHITA_SDK_PATH="$env:GITHUB_WORKSPACE/ashita-sdk/plugins/sdk"
 
