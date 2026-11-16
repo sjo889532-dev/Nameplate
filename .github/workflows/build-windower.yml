@@ -1,0 +1,53 @@
+
+name: Build Nameplate for Windower
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out Nameplate
+        uses: actions/checkout@v4
+
+      - name: Check out Ashita v4 SDK
+        uses: actions/checkout@v4
+        with:
+          repository: AshitaXI/Ashita-v4beta
+          path: ashita-sdk
+          ref: main
+
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 4.2.1
+          ninjaVersion: latest
+
+      - name: Set up Visual Studio build environment
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Configure Ashita v4 / Windozer target
+        shell: pwsh
+        run: |
+          cmake -S . -B build -G Ninja `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_C_COMPILER=clang `
+            -DCMAKE_CXX_COMPILER=clang `
+            -DCMAKE_C_COMPILER_FORCED=ON `
+            -DCMAKE_CXX_COMPILER_FORCED=ON `
+            -DTARGET_PLATFORM=ASHITA_V4 `
+            -DASHITA_SDK_PATH="$env:GITHUB_WORKSPACE/ashita-sdk/plugins/sdk"
+
+      - name: Build DLL
+        run: cmake --build build --config Release
+
+      - name: Upload DLL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nameplate-AshitaV4-Windozer
+          path: build/Nameplate.dll
+          if-no-files-found: error
